@@ -1,0 +1,49 @@
+﻿@page "/ConfigExample"
+@inject IConfiguration config
+
+<PageTitle>Mail Server Configuration</PageTitle>
+
+<h1>Mail Server Configuration</h1>
+
+<ul>
+    <li>Hostname: @hostname</li>
+    <li>Username: @username</li>
+    <li>Password: @password</li>
+    <li>Port: @port</li>
+</ul>
+
+<p>Using SmtpServerOptions</p>
+<ul>
+    <li>Hostname: @smtpServer.Hostname</li>
+    <li>Username: @smtpServer.Username</li>
+    <li>Password: @smtpServer.Password</li>
+    <li>Port: @smtpServer.Port</li>
+</ul>
+
+@code {
+
+    private string? hostname;
+    private string? username;
+    private string? password;
+    private int port;
+
+    private SmtpServerOptions smtpServer;
+
+    protected override Task OnInitializedAsync()
+    {
+        hostname = config["SmtpServer:Hostname"];
+        username = config.GetValue<string>("SmtpServer:Username");
+
+        var smtpServerSection = config.GetSection("SmtpServer");
+        password = smtpServerSection["Password"];
+        port = smtpServerSection.GetValue<int>("Port");
+
+        smtpServer = new SmtpServerOptions();
+        smtpServerSection.Bind(smtpServer);
+
+        //smtpServer = smtpServerSection.Get<SmtpServerOptions>();
+
+        return base.OnInitializedAsync();
+    }
+}
+

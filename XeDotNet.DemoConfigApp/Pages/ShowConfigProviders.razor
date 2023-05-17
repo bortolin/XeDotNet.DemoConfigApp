@@ -1,0 +1,23 @@
+﻿@page "/ShowConfigProviders"
+@inject IConfiguration config
+
+<h3>Config providers loaded</h3>
+
+@foreach (var item in configRoot.Providers)
+{
+    <ul>
+        <li>@item.ToString()</li>
+    </ul>
+}
+
+@code {
+
+    private IConfigurationRoot configRoot;
+
+    protected override Task OnInitializedAsync()
+    {
+        configRoot = (IConfigurationRoot)config;
+        return base.OnInitializedAsync();
+    }
+}
+

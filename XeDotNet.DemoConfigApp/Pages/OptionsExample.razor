@@ -1,0 +1,26 @@
+﻿@page "/OptionsExample"
+@inject IOptions<SmtpServerOptions> smtpServerOptions
+
+<PageTitle>Mail Server Configuration</PageTitle>
+
+<h1>Mail Server Configuration</h1>
+
+<ul>
+    <li>Hostname: @smtpServer.Hostname</li>
+    <li>Username: @smtpServer.Username</li>
+    <li>Password: @smtpServer.Password</li>
+    <li>Port: @smtpServer.Port</li>
+</ul>
+
+@code {
+
+    SmtpServerOptions smtpServer;
+
+    protected override Task OnInitializedAsync()
+    {
+        smtpServer = smtpServerOptions.Value;
+
+        return base.OnInitializedAsync();
+    }
+}
+

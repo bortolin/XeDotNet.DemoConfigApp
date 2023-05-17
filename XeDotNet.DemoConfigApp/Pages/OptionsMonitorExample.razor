@@ -1,0 +1,32 @@
+﻿@page "/OptionsMonitorExample"
+@inject IOptionsMonitor<SmtpServerOptions> smtpServerOptionsMonitor
+
+<PageTitle>Mail Server Configuration</PageTitle>
+
+<h1>Mail Server Configuration</h1>
+
+<ul>
+    <li>Hostname: @smtpServer.Hostname</li>
+    <li>Username: @smtpServer.Username</li>
+    <li>Password: @smtpServer.Password</li>
+    <li>Port: @smtpServer.Port</li>
+</ul>
+
+@code {
+
+    SmtpServerOptions smtpServer;
+
+    protected override Task OnInitializedAsync()
+    {
+        smtpServer = smtpServerOptionsMonitor.CurrentValue;
+
+        smtpServerOptionsMonitor.OnChange((options) =>
+            {
+                smtpServer = options;
+                InvokeAsync(() => StateHasChanged());
+            });
+
+        return base.OnInitializedAsync();
+    }
+}
+

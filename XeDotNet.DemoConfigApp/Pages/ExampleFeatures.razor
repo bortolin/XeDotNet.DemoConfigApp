@@ -1,0 +1,73 @@
+﻿@page "/ExampleFeatures"
+@using XeDotNet.DemoConfigApp.Data
+@inject WeatherForecastService ForecastService
+@inject IFeatureManager fmanager
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+<table class="table">
+        <thead style=" background-color:@HeaderColor">
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                @if (EnableFTemp)
+                {
+                    <th>Temp. (F)</th>
+                }
+                <th>Summary</th>
+                @if (EnableUmidity)
+                {
+                    <th>Umidity</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    @if (EnableFTemp)
+                    {
+                        <td>@forecast.TemperatureF</td>
+                    }
+                    <td>@forecast.Summary</td>
+                    @if (EnableUmidity)
+                    {
+                        <td>@forecast.Umidity.ToString("P")</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private WeatherForecast[]? forecasts;
+
+    private bool EnableFTemp;
+    private bool EnableUmidity;
+    private string HeaderColor = "white";
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now));
+
+        EnableFTemp = await fmanager.IsEnabledAsync("EnableFTemp");
+        if (await fmanager.IsEnabledAsync("HeaderColorGray")) HeaderColor = "LightGray";
+        EnableUmidity = await fmanager.IsEnabledAsync("EnableUmidity");
+    }
+}
+
