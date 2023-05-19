@@ -18,40 +18,48 @@ var builder = WebApplication.CreateBuilder();
 string? appConfigCnnString = builder.Configuration.GetConnectionString("AppConfig");
 string? sqlServerCnnString = builder.Configuration.GetConnectionString("SqlServer");
 
+#region CustomProviders
 if (sqlServerCnnString is not null)
-    builder.Configuration.AddSqlServer(sqlServerCnnString, "Table", "Key", "Value");
+    builder.Configuration.AddSqlServer(sqlServerCnnString, "MySettings", "Key", "Value");
+#endregion
 
+#region AzureAppConfiguration
 if (appConfigCnnString is not null)
 {
-    // Load configuration from Azure App Configuration
-    builder.Configuration.AddAzureAppConfiguration(appConfigCnnString);
+    // Load configuration from Azure App Configuration (minimal)
+    //builder.Configuration.AddAzureAppConfiguration(appConfigCnnString);
 
+    // Load configuration from Azure App Configuration (with options)
     //builder.Configuration.AddAzureAppConfiguration(options =>
     //{
     //    options.Connect(appConfigCnnString)
-    //    .ConfigureKeyVault(kv =>
-    //    {
-    //        kv.SetCredential(new DefaultAzureCredential());
-    //    })
-    //            .UseFeatureFlags(options => options.CacheExpirationInterval = TimeSpan.FromSeconds(10))
-    //           // Load all keys that start with `TestApp:` and have no label
-    //           .Select("SmtpServer:*", LabelFilter.Null)
-    //           // Configure to reload configuration if the registered sentinel key is modified
-    //           .ConfigureRefresh(refreshOptions =>
-    //                refreshOptions.Register("SmtpServer:Sentinel", refreshAll: true));
+    //        // Load all keys that start with `SmtpServer:` and have no label
+    //        .Select("SmtpServer:*", LabelFilter.Null);
+               
+    //        // Configure to reload configuration if the registered sentinel key is modified
+    //        //.ConfigureRefresh(refreshOptions =>
+    //        //     refreshOptions.Register("SmtpServer:Sentinel", refreshAll: true));
+
+    //        //.UseFeatureFlags(options => options.CacheExpirationInterval = TimeSpan.FromSeconds(10);
+                
+    //        // Configure KeyVault as a configuration source
+    //        //.ConfigureKeyVault(kv => kv.SetCredential(new DefaultAzureCredential()));
     //});
 
+    //Register the Azure App Configuration provider
     builder.Services.AddAzureAppConfiguration();
 }
+#endregion
 
+#region FeaturesFlags
+// Register the feature management services
 builder.Services.AddFeatureManagement()
     .AddFeatureFilter<PercentageFilter>()
     .AddFeatureFilter<TimeWindowFilter>()
     .AddFeatureFilter<ClaimsFeatureFilter>();
-
     //.AddFeatureFilter<TargetingFilter>()
     //TargetingFilter view https://github.com/microsoft/FeatureManagement-Dotnet
-
+#endregion
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -60,6 +68,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 builder.Services.AddOptions<SmtpServerOptions>().Bind(builder.Configuration.GetSection(SmtpServerOptions.SmtpServer));
 
+// Need to custom ClaimsFeatureFilter for access user information
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -72,6 +81,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Enable Azure App Configuration
 if (appConfigCnnString is not null) app.UseAzureAppConfiguration();
 
 app.UseHttpsRedirection();
