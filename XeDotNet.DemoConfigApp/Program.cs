@@ -17,6 +17,12 @@ var builder = WebApplication.CreateBuilder();
 // Retrieve the connection strings
 string? appConfigCnnString = builder.Configuration.GetConnectionString("AppConfig");
 string? sqlServerCnnString = builder.Configuration.GetConnectionString("SqlServer");
+string? keyVaultUrl = builder.Configuration["KeyVault:Url"];
+
+#region AzureKeyValut
+if (keyVaultUrl is not null)
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUrl), new DefaultAzureCredential());
+#endregion
 
 #region CustomProviders
 if (sqlServerCnnString is not null)
