@@ -23,6 +23,16 @@ if (sqlServerCnnString is not null)
     builder.Configuration.AddSqlServer(sqlServerCnnString, "MySettings", "Key", "Value");
 #endregion
 
+#region FeaturesFlags
+// Register the feature management services
+builder.Services.AddFeatureManagement()
+    .AddFeatureFilter<PercentageFilter>()
+    .AddFeatureFilter<TimeWindowFilter>()
+    .AddFeatureFilter<ClaimsFeatureFilter>();
+//.AddFeatureFilter<TargetingFilter>()
+//TargetingFilter view https://github.com/microsoft/FeatureManagement-Dotnet
+#endregion
+
 #region AzureAppConfiguration
 if (appConfigCnnString is not null)
 {
@@ -35,13 +45,15 @@ if (appConfigCnnString is not null)
     //    options.Connect(appConfigCnnString)
     //        // Load all keys that start with `SmtpServer:` and have no label
     //        .Select("SmtpServer:*", LabelFilter.Null);
-               
-    //        // Configure to reload configuration if the registered sentinel key is modified
-    //        //.ConfigureRefresh(refreshOptions =>
-    //        //     refreshOptions.Register("SmtpServer:Sentinel", refreshAll: true));
+
+    //        //Configure to reload configuration if the registered sentinel key is modified
+    //        //.ConfigureRefresh(refreshOptions => {
+    //        //    refreshOptions.Register("SmtpServer:Sentinel", refreshAll: true);
+    //        //    refreshOptions.SetCacheExpiration(TimeSpan.FromSeconds(5));
+    //        // });
 
     //        //.UseFeatureFlags(options => options.CacheExpirationInterval = TimeSpan.FromSeconds(10);
-                
+
     //        // Configure KeyVault as a configuration source
     //        //.ConfigureKeyVault(kv => kv.SetCredential(new DefaultAzureCredential()));
     //});
@@ -51,15 +63,6 @@ if (appConfigCnnString is not null)
 }
 #endregion
 
-#region FeaturesFlags
-// Register the feature management services
-builder.Services.AddFeatureManagement()
-    .AddFeatureFilter<PercentageFilter>()
-    .AddFeatureFilter<TimeWindowFilter>()
-    .AddFeatureFilter<ClaimsFeatureFilter>();
-    //.AddFeatureFilter<TargetingFilter>()
-    //TargetingFilter view https://github.com/microsoft/FeatureManagement-Dotnet
-#endregion
 
 // Add services to the container.
 builder.Services.AddRazorPages();

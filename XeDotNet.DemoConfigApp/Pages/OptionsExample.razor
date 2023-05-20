@@ -1,9 +1,10 @@
 ﻿@page "/OptionsExample"
 @inject IOptions<SmtpServerOptions> smtpServerOptions
+@inject IOptionsSnapshot<SmtpServerOptions> smtpServerOptionsSnapshot
 
 <PageTitle>Mail Server Configuration</PageTitle>
 
-<h1>Mail Server Configuration</h1>
+<h1>Mail Server Configuration (IOptions)</h1>
 
 <ul>
     <li>Hostname: @smtpServer.Hostname</li>
@@ -12,13 +13,24 @@
     <li>Port: @smtpServer.Port</li>
 </ul>
 
+<p>Using IOptionsSnapshot</p>
+
+<ul>
+    <li>Hostname: @smtpServerSnapshot.Hostname</li>
+    <li>Username: @smtpServerSnapshot.Username</li>
+    <li>Password: @smtpServerSnapshot.Password</li>
+    <li>Port: @smtpServerSnapshot.Port</li>
+</ul>
+
 @code {
 
     SmtpServerOptions smtpServer;
+    SmtpServerOptions smtpServerSnapshot;
 
     protected override Task OnInitializedAsync()
     {
         smtpServer = smtpServerOptions.Value;
+        smtpServerSnapshot = smtpServerOptionsSnapshot.Value;
 
         return base.OnInitializedAsync();
     }
